@@ -130,18 +130,6 @@ n8n_RAG_chatbot/
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Issues](../../issues) section
-2. Review n8n [documentation](https://docs.n8n.io/)
-3. Consult Facebook [Messenger Platform docs](https://developers.facebook.com/docs/messenger-platform/)
-
 ## 🙏 Acknowledgments
 
 - [n8n](https://n8n.io/) - Workflow automation platform
