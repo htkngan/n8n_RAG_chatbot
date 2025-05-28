@@ -1,0 +1,26 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ...
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - ./local_data:/local_data
+    environment:
+      - N8N_PORT=5555
+      - N8N_EDITOR_BASE_URL=...
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - WEBHOOK_URL=...
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_tunnel
+    environment:
+      - NGROK_AUTHTOKEN=...
+    command: http n8n:5555 --domain=...
+    ports:
+      - "4040:4040"
+    restart: unless-stopped

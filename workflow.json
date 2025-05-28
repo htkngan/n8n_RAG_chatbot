@@ -1,0 +1,870 @@
+{
+  "name": "Create_data_embedding_strore",
+  "nodes": [
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        260
+      ],
+      "id": "75b47e78-935e-4500-8d99-a1e23f9f1c37",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 1,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        420
+      ],
+      "id": "251ee1f7-a783-44d6-8894-196a2162dc49",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "=demochatbot",
+          "mode": "id"
+        },
+        "options": {
+          "clearNamespace": true,
+          "pineconeNamespace": "badocare"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        1400,
+        40
+      ],
+      "id": "52128e9e-cbb4-4369-b8ae-6bfc154a59bc",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "R9BWHdrTeMKZkOYj",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 2000,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1160,
+        20
+      ],
+      "id": "41190e0c-efd1-46f9-8f4a-32cb4468ad0c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "Bạn là một chatbot hỗ trợ người dùng dựa trên **Thông tin tài liệu**: là **Bado_care_data_store1* hướng dẫn sử dụng Bado Care. Dựa trên thông tin tài liệu được cung cấp và câu hỏi của người dùng, hãy trả lời ngắn gọn, chính xác và dễ hiểu bằng tiếng Việt. Nếu thông tin không đủ để trả lời, hãy nói rõ rằng thông tin không có trong tài liệu và đề xuất cách tiếp cận hợp lý. Không bịa đặt thông tin.\n\n**Thông tin tài liệu**:\n{{ Bado_care_data_store1 }} \n\n**Câu hỏi người dùng**:\n{{ $json.content }}\n\n**Hướng dẫn trả lời**:\n1. Tóm tắt thông tin liên quan từ tài liệu để trả lời câu hỏi.\n2. Trả lời bằng tiếng Việt, sử dụng ngôn ngữ tự nhiên, thân thiện.\n3. Nếu câu hỏi không rõ, yêu cầu làm rõ hoặc trả lời dựa trên ngữ cảnh tốt nhất.\n4. Định dạng câu trả lời ngắn gọn, không vượt quá 200 từ trừ khi cần giải thích chi tiết.\n\n**Ví dụ trả lời**:\n- Câu hỏi: \"Xem danh sách sản phẩm ở đâu?\"\n- Trả lời: Theo tài liệu, ở phân hệ Sản Phẩm, Dịch Vụ, bạn chọn Sản Phẩm, Dịch Vụ. Hệ thống sẽ hiển thị trang danh sách sản phẩm của cửa\nhàng.\n\n**Trả lời**:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        300,
+        600
+      ],
+      "id": "aee1d572-3453-42e9-9ff1-035f33e24167",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.user_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        820
+      ],
+      "id": "dd288717-cf15-4aaa-a895-7b51f5f05cde",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "demochatbot",
+          "mode": "list",
+          "cachedResultName": "demochatbot"
+        },
+        "options": {
+          "pineconeNamespace": "badocare"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        740,
+        860
+      ],
+      "id": "befef03d-a9c8-440f-93f5-817280f52bee",
+      "name": "Bado_care_data_store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "R9BWHdrTeMKZkOYj",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Use RAG to look up information in the knowledgebase",
+        "topK": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        760
+      ],
+      "id": "eda7c0de-c1f4-4c89-ae9b-8644de47ea05",
+      "name": "Bado_care_data_store1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        260
+      ],
+      "id": "3019ff2e-07db-4a98-841e-3132cdcb72d1",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "1fBZfr6fgbVc7nbV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxRetries": 2,
+          "topP": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        820
+      ],
+      "id": "3c06b1ac-84b7-4830-b877-76974dc92d5d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1fBZfr6fgbVc7nbV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        1080
+      ],
+      "id": "a1d887bc-e371-47c1-bf98-9f89938d542e",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "1fBZfr6fgbVc7nbV",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        -180,
+        520
+      ],
+      "id": "c94077f7-7b09-42c1-b280-777a3dc33ea5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "0bf7cedb-4357-41d1-9ecf-46fd8dce81a6",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        960
+      ],
+      "id": "cf9701d5-1c70-4d37-aca8-3c262fd7af93",
+      "name": "Messenger",
+      "webhookId": "0bf7cedb-4357-41d1-9ecf-46fd8dce81a6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "70195f73-5f1a-4ad9-b6b7-32a869e0dd94",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        1140
+      ],
+      "id": "ad1f518b-e7ea-4e39-aa31-40eda4def2ea",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4883e62-2aef-4e9d-8d0b-2ff7835b8681",
+              "name": "user_id",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "e55dd62f-4c38-42c7-902c-4251c4235cdf",
+              "name": "page_id",
+              "value": "={{ $json.body.entry[0].messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "fb87b1cd-0993-48f8-90bc-e17a2a3b39ba",
+              "name": "content",
+              "value": "={{ $json.body.entry[0].messaging[0].message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        40,
+        620
+      ],
+      "id": "99424d0f-26b5-4a0a-98f8-7c676a105f10",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body ={\n  \"recipient\": {\n    \"id\": `${$('Edit Fields').first().json.user_id}`\n  },\n    \"message\": {\n     \"text\" : `${$input.first().json.output}`\n  }    \n}\nreturn {\n  data: body\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        600
+      ],
+      "id": "7e9003bd-b69d-4a6b-8d02-ebe5c0490b9e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "...",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ..."
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        600
+      ],
+      "id": "6e2250c5-0e03-412f-a447-2521294a7197",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "70195f73-5f1a-4ad9-b6b7-32a869e0dd94",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1000,
+        1720
+      ],
+      "id": "d494ba49-2166-470a-94fd-51f68afd4ffc",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body ={\n  \"recipient\": {\n    \"id\": `${$('Messenger').first().json.body.entry[0].messaging[0].sender.id}`\n  },\n    \"message\": {\n     \"text\" : \"Xin chào, tôi là chatbot của Bado Care🤖! Bạn cần tôi giúp gì hôm nay?\"\n  }    \n}\nreturn {\n  data: body\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        1180
+      ],
+      "id": "10b83d04-d174-41d5-a64f-7f7f20cc831e",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "...",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ..."
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        1180
+      ],
+      "id": "1520559f-36dd-4184-9638-55f5598a4138",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1-Cr0zdAvxSLcEmY-SbiIAMLMVsOnlQWS",
+          "mode": "list",
+          "cachedResultName": "...",
+          "cachedResultUrl": "..."
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -80
+      ],
+      "id": "d17ed691-f86c-4327-8a01-53d207db8e3f",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5x7b0CRDimphRx91",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1-Cr0zdAvxSLcEmY-SbiIAMLMVsOnlQWS",
+          "mode": "list",
+          "cachedResultName": "...",
+          "cachedResultUrl": "..."
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        140
+      ],
+      "id": "bcab01f0-84df-43d4-afb6-78d44f54e943",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5x7b0CRDimphRx91",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Clean up duplicated lines, empty lines, unwanted lines\nconst rawText = $input.first().json.content;\nconst lines = rawText\n  .split('\\n')\n  .map(line => line.trim())\n  .filter(line => line !== '') // remove empty lines\n  .filter((line, index, arr) => index === 0 || line !== arr[index - 1]) // remove duplicated lines\n  .map(line => line.replace(/^\\(\\d+\\)| \\(\\d+\\)/g, '').trim()) // remove (number) patterns at start or standalone\n\n// Optional: lọc những dòng \"không giá trị\"\nconst ignoredKeywords = ['copyright', '©', 'Hình'];\nconst cleanedLines = lines.filter(line =>\n  !ignoredKeywords.some(keyword => line.toLowerCase().includes(keyword))\n);\n\nreturn [{ json: { cleanedText: cleanedLines.join('\\n') } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        20
+      ],
+      "id": "1a8fc787-7c9f-42e1-9f4e-5d57e6ff5ba0",
+      "name": "pre-processing"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        720,
+        20
+      ],
+      "id": "6b90ea41-f4e5-4cd8-86c1-99770e301283",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CMeZ1paGXUnjdZjV",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1-Cr0zdAvxSLcEmY-SbiIAMLMVsOnlQWS",
+            "mode": "list",
+            "cachedResultName": "",
+            "cachedResultUrl": "..."
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.document"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        200,
+        20
+      ],
+      "id": "8933840d-e7a6-4887-8497-feea51e81095",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5x7b0CRDimphRx91",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        460,
+        20
+      ],
+      "id": "869788ef-d9d8-4dbb-bdcb-6efe2f173316",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5x7b0CRDimphRx91",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bado_care_data_store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Bado_care_data_store1",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bado_care_data_store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Bado_care_data_store1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Bado_care_data_store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Messenger": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pre-processing": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "pre-processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "faa4860f-ff44-4683-84ad-51b62d7179d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "feb3e0a27be64ae4427bf8d84c0c146f402bfabca03ae57cafd5ae2791f0aab1"
+  },
+  "id": "ZuwQ58crALoAzPpj",
+  "tags": []
+}
